@@ -1,7 +1,19 @@
-# ReactionRL
-This is the code for \<paper\>. Reaction rules are extracted from USPTO-MIT dataset and used as actions for reinforcement learning for molecular applications. Two applications are created:  
+# PURE: Policy-guided Unbiased REpresentations for structure-constrained molecular generation
+
+PURE uses:
+ 1. A Graph Isomorphism Network (GIN) to encode molecular structures as graphs.  
+2. Template-based molecular simulations, extracted from the USPTO-MIT reaction database, which constrain exploration to chemically valid, synthesizable reactions.  
+3. A policy-guided actor–critic RL setup, where molecular similarity naturally emerges from the learned representations rather than being hard-coded through external metrics.  
+
+For more details, please refer to  
+**Gupta, A., Lenin, B., Current, S., Batra, R., Ravindran, B., Raman, K., & Parthasarathy, S. (2025). PURE: Policy-guided Unbiased REpresentations for structure-constrained molecular generation. bioRxiv, 2025-05.** ([[link](https://www.biorxiv.org/content/10.1101/2025.05.21.655002v1.full.pdf)](https://www.biorxiv.org/content/10.1101/2025.05.21.655002v1.full.pdf)). 
+
+## Contents of repo
+This repo contains two applications:
 1. Drug discovery using a gymnasium-compatible RL simulator (Online RL)
 2. Lead optimization without using similarity-based metrics (Goal-conditioned RL + offline RL)
+
+_The code for PURE corresponds to the second application._
 
 
 # Requirements

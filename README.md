@@ -6,7 +6,7 @@ PURE uses:
 3. A policy-guided actor–critic RL setup, where molecular similarity naturally emerges from the learned representations rather than being hard-coded through external metrics.  
 
 For more details, please refer to  
-**Gupta, A., Lenin, B., Current, S., Batra, R., Ravindran, B., Raman, K., & Parthasarathy, S. (2025). PURE: Policy-guided Unbiased REpresentations for structure-constrained molecular generation. bioRxiv, 2025-05.** ([[link](https://www.biorxiv.org/content/10.1101/2025.05.21.655002v1.full.pdf)](https://www.biorxiv.org/content/10.1101/2025.05.21.655002v1.full.pdf)). 
+**Gupta, A., Lenin, B., Current, S., Batra, R., Ravindran, B., Raman, K., & Parthasarathy, S. (2025). PURE: Policy-guided Unbiased REpresentations for structure-constrained molecular generation. bioRxiv, 2025-05.** ([https://www.biorxiv.org/content/10.1101/2025.05.21.655002v1.full.pdf](https://www.biorxiv.org/content/10.1101/2025.05.21.655002v1.full.pdf)). 
 
 ## Contents of repo
 This repo contains two applications:

@@ -1,0 +1,1 @@
+from reactionrl.data.molecule_utils import molecule_from_smile

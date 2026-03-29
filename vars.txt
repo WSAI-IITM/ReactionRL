@@ -1,1 +1,0 @@
-export MAIN_DIR=/home/abhor/Desktop/ReactionRL

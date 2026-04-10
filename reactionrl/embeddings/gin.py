@@ -11,7 +11,7 @@ class Zinc_GIN_Embedder(BaseEmbeddingClass):
         if model_path is None:
             model_path = str(PRETRAINED_MODELS_DIR / "zinc2m_gin.pth")
         self.device = device
-        self.model = torch.load(model_path).to(self.device)
+        self.model = torch.load(model_path, weights_only=False).to(self.device)
 
     def _torchdrug_mol(self, mol):
         if isinstance(mol, str):

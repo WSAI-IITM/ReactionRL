@@ -1,6 +1,6 @@
 datasets/
-models/
-!models/MPNN*
+/models/
+!/models/MPNN*
 tensorboard/
 */__pycache__/
 __pycache__/

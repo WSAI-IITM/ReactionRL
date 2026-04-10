@@ -68,7 +68,7 @@ class OfflineRLTrainer:
 
         # Embedding model for computing action embeddings - synced with model's GIN
         gin_path = config.get_gin_model_path()
-        self.embedding_model = torch.load(gin_path).to(self.device)
+        self.embedding_model = torch.load(gin_path, weights_only=False).to(self.device)
         self.embedding_model.load_state_dict(model.GIN.state_dict())
         self.action_embeddings = get_action_dataset_embeddings(
             self.embedding_model, dataset.action_rsigs, dataset.action_psigs

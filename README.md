@@ -19,10 +19,11 @@ reactionrl/                  # Main package
 ├── models/                  # Actor, Critic, ActorCritic networks
 ├── rewards/                 # Property scorers (logP, QED, DRD2, SA, similarity)
 ├── data/                    # Dataset loading & trajectory generation
+├── generation/              # Beam search molecule generation (Algorithm 2)
 ├── training/                # Trainer, losses, ranking metrics
 ├── evaluation/              # PURE vs baseline comparison metrics
 ├── preprocessing/           # Data pipeline scripts (USPTO extraction)
-├── scripts/                 # CLI entry points (train, generate_data, preprocess)
+├── scripts/                 # CLI entry points (train, generate_data, generate_molecules, evaluate)
 ├── utils/                   # Shared molecule utilities
 └── config.py                # Paths & TrainingConfig dataclass
 pretrained_models/           # GIN and MPNN pretrained weights
@@ -113,6 +114,58 @@ Options:
 - `--negative-selection`: `random`, `closest`, `e-greedy`, or `combined`
 - `--num-workers`: Parallel workers for data preparation
 
+### 4. Generate molecules (Algorithm 2 beam search)
+
+Given a trained model, generate molecules similar to targets:
+
+```bash
+python -m reactionrl.scripts.generate_molecules \
+    --model-path output/supervised/actor-critic/steps=5_actor_loss=PG_neg=combined_seed=42/model.pth \
+    --source-smiles "c1ccc(-c2ccccc2)cc1" \
+    --target-smiles "c1ccc(O)cc1" \
+    --steps 5 --topk-actor 50 --topk-critic 5 \
+    --output results/generated.pickle --cuda 0
+```
+
+Options:
+- `--model-path`: Path to trained model checkpoint
+- `--source-smiles` / `--source-file`: Starting molecule(s)
+- `--target-smiles` / `--target-file`: Target molecule(s)
+- `--steps`: Number of generation steps (default: 5)
+- `--topk-actor`: Actor pre-filter count B_A (default: 50)
+- `--topk-critic`: Beam width B after critic re-ranking (default: 5)
+- `--num-workers`: Parallel workers (default: 8)
+
+### 5. Evaluate on COMA benchmarks
+
+Evaluate the trained model on QED, DRD2, pLogP04, or pLogP06 benchmarks:
+
+```bash
+python -m reactionrl.scripts.evaluate \
+    --model-path output/supervised/actor-critic/steps=5_actor_loss=PG_neg=combined_seed=42/model.pth \
+    --property qed --cuda 0
+```
+
+Options:
+- `--property`: Benchmark to evaluate (`qed`, `drd2`, `logp04`, `logp06`)
+- `--num-start-mols`: Starting molecules per target (default: 10, selects 3x this)
+- `--num-decode`: Top molecules per target for metrics (default: 20)
+- `--max-targets`: Limit number of test targets (useful for quick testing)
+- `--steps`, `--topk-actor`, `--topk-critic`, `--num-workers`: Same as generation
+
+**Benchmark test data** must be downloaded separately:
+
+1. Clone: `git clone https://github.com/wengong-jin/iclr19-graph2graph`
+2. Copy test files:
+   ```bash
+   for prop in qed drd2 logp04 logp06; do
+       mkdir -p datasets/coma/$prop
+       cp iclr19-graph2graph/data/$prop/test.txt datasets/coma/$prop/rdkit_test.txt
+   done
+   ```
+
+The script will print download instructions if test data is missing.
+
 ---
 
 ## How to Experiment
@@ -183,6 +236,35 @@ Property scorers are in `reactionrl/rewards/`:
 from reactionrl.rewards import logP, qed, drd2, SA, similarity
 ```
 
+### Use the generation module programmatically
+
+```python
+from reactionrl.generation import generate_molecules, prepare_action_data
+import torch
+
+# Load trained model
+model = torch.load("output/supervised/actor-critic/.../model.pth", weights_only=False)
+model.eval()
+
+# Prepare action data (one-time)
+action_dataset, action_rsigs, action_psigs = prepare_action_data()
+
+# Generate molecules
+traj_dict, sim_dict = generate_molecules(
+    model,
+    source_smiles=["c1ccc(-c2ccccc2)cc1"],
+    target_smiles=["c1ccc(O)cc1"],
+    action_rsigs=action_rsigs,
+    action_psigs=action_psigs,
+    device=torch.device("cuda:0"),
+    steps=5,
+    topk_actor=50,
+    topk_critic=5,
+)
+# traj_dict maps trajectory keys to SMILES
+# sim_dict maps trajectory keys to Tanimoto similarity to target
+```
+
 ### Use the action space programmatically
 
 ```python
@@ -251,3 +333,4 @@ trainer.save("output/my_experiment")
   doi={10.1101/2025.05.21.655002}
 }
 ```
+
